@@ -115,7 +115,7 @@ class K_isp_contur:
         elif self.p >= 10:
             # self.tab1, self.tab2 = self.tabl_10, self.tabl_10
             self.tab_out = self.tabl_10
-
+        self.interpol_dict_for_h_lvert()
     def get_interpol_for_p(self) -> None:
         '''Интерполяция по p1/p2'''
         min_p, max_p = self.min_max(self.p, [0.5, 1, 3, 10])
@@ -152,19 +152,20 @@ class K_isp_contur:
         '''Интерполяция по m'''
         min_m, max_m = self.min_max(m, [2, 4, 6, 8, 12])
         if m == 1:
-            self.interpol_dict_for_m = self.tab_out[2]
+            list_out = self.tab_out1[2]
         elif m == 2 or m == 4 or m == 2 or m == 6 or m == 8:
-            self.interpol_dict_for_m = self.tab_out[m]
+            list_out = self.tab_out1[m]
         elif m == 10:
-            self.interpol_dict_for_m = [self.lin_interpol(m, min_m, max_m, self.tab_out[min_m][i], self.tab_out[max_m][i]) for i in range(9)]
+            list_out = [self.lin_interpol(m, min_m, max_m, self.tab_out1[min_m][i], self.tab_out1[max_m][i]) for i in range(3)]
         elif m == 12 and self.a1 / self.a2 != 0.5:
-            self.interpol_dict_for_m = self.tab_out[m]
+            list_out = self.tab_out1[m]
         elif m == 12 and self.a1 / self.a2 == 0.5:
-            self.interpol_dict_for_m = self.tab_out['12*']
+            list_out = self.tab_out1['12*']
         elif m != 1 and m % 2 != 0 and m < 12:
-            self.interpol_dict_for_m = [self.lin_interpol(m, min_m, max_m, self.tab_out[min_m][i], self.tab_out[max_m][i]) for i in range(9)]
+            list_out = [self.lin_interpol(m, min_m, max_m, self.tab_out1[min_m][i], self.tab_out1[max_m][i]) for i in range(3)]
         elif m > 12:
-            self.interpol_dict_for_m = self.tab_out[12]
+            list_out = self.tab_out1[12]
+        self.interpol_dict_for_a_lvert(list_out, (self.a1 + self.a2) * 2 / m)
 
 
     def interpol_dict_for_a_lvert(self, list_in: list, a_middle):
@@ -181,31 +182,15 @@ class K_isp_contur:
             self.K_i = self.lin_interpol(a_middle, min_a_lvert, max_a_lvert, list_in[1], list_in[2])
         elif a_middle >= 2:
             self.K_i = list_in[2]
-
-
-    def get_K_isp_auto(self):
-        self.get_tabl()
-        self.interpol_dict_for_h_lvert()
-        # self.interpol_dict_for_a_lvert(self.list_for_a_lvert, (self.a1 + self.a2) * 2 / self.m)
-        # print(self.p1 / self.p2, self.h / self.l_vert, (self.a1 + self.a2) * 2 /  self.m / self.l_vert)
-
-
-
+        print(self.K_i)
 
 
 if __name__ == '__main__':
-        K_isp = K_isp_contur(250, 500, 2.5, 10, 8, 14)
-        K_isp.get_K_isp_auto()
+        K_isp = K_isp_contur(250, 30, 2.5, 10, 8, 14)
+        K_isp.get_tabl()
+
         for m in range(2, 13):
             K_isp.get_interpol_for_m(m)
-        # K_isp.interpol_dict_for_h_lvert()
-        #     K_isp.get_K_isp_auto()
-        #     print(K_isp.K_i)
-        # K_isp.get_K_isp_auto()
-        # print(K_isp.K_i)
-
-# [0.792, 0.751, 0.696, 0.64, 0.608, 0.58]
-
 
 
 

@@ -11,7 +11,6 @@ class K_isp_ryad:
         return round(B_1 / (self.m ** b_1), 3)
 
 
-
 class K_isp_contur:
     tabl_05 = {
         2: [0.490, 0.483, 0.524, 0.504, 0.484, 0.512, 0.528, 0.500, 0.518],
@@ -53,9 +52,7 @@ class K_isp_contur:
         a2 - длинна горизонтального заземлителя, сторона 2, м.;;
         a_middle - среднее расстояние между вертикальными заземлителями, м.;
         '''
-        # self.m = m
 
-        self.tab_out1 = {}
         self.p1 = p1
         self.p2 = p2
         self.p = self.p1 / self.p2
@@ -66,6 +63,7 @@ class K_isp_contur:
         self.tab1 = None
         self.tab2 = None
         self.tab_out = {}
+        self.tab_out1 = {}
 
     @staticmethod
     def lin_interpol(x: float, x1: float, x2: float, f_x1: float, f_x2: float) -> float:
@@ -95,32 +93,30 @@ class K_isp_contur:
     def get_tabl(self) -> None:
         '''Получаем таблицы для соответствующего p1/p2'''
         if self.p <= 0.5:
-            # self.tab1, self.tab2 = self.tabl_05, self.tabl_05
             self.tab_out = self.tabl_05
         elif 0.5 < self.p < 1:
             self.tab1, self.tab2 = self.tabl_05, self.tabl_1
             self.get_interpol_for_p()
         elif self.p == 1:
-            # self.tab1, self.tab2 = self.tabl_1, self.tabl_1
             self.tab_out = self.tabl_1
         elif 1 < self.p < 3:
             self.tab1, self.tab2 = self.tabl_1, self.tabl_3
             self.get_interpol_for_p()
         elif self.p == 3:
-            # self.tab1, self.tab2 = self.tabl_3, self.tabl_3
             self.tab_out = self.tabl_3
         elif 3 < self.p < 10:
             self.tab1, self.tab2 = self.tabl_3, self.tabl_10
             self.get_interpol_for_p()
         elif self.p >= 10:
-            # self.tab1, self.tab2 = self.tabl_10, self.tabl_10
             self.tab_out = self.tabl_10
         self.interpol_dict_for_h_lvert()
+
     def get_interpol_for_p(self) -> None:
         '''Интерполяция по p1/p2'''
         min_p, max_p = self.min_max(self.p, [0.5, 1, 3, 10])
         for key in self.tab1.keys():
-            list_interpol = [self.lin_interpol(self.p, min_p, max_p, self.tab1[key][i], self.tab2[key][i]) for i in range(9)]
+            list_interpol = [self.lin_interpol(self.p, min_p, max_p, self.tab1[key][i], self.tab2[key][i]) for i in
+                             range(9)]
             self.tab_out.update({key: list_interpol})
 
     def interpol_dict_for_h_lvert(self):
@@ -129,24 +125,17 @@ class K_isp_contur:
         for key in self.tab_out.keys():
             if result <= 0.2:
                 res = self.tab_out[key][0:3]
-        #     self.list_for_a_lvert = list_in[0:3]
             elif 0.5 > result > 0.2:
-                res = [(self.lin_interpol(result, 0.2, 0.5, self.tab_out[key][0:3][i], self.tab_out[key][3:6][i])) for i in range(3)]
-            #     self.list_for_a_lvert = [(self.lin_interpol(result, 0.2, 0.5, list_in[0:3][i], list_in[3:6][i])) for i in range(3)]
+                res = [(self.lin_interpol(result, 0.2, 0.5, self.tab_out[key][0:3][i], self.tab_out[key][3:6][i])) for i
+                       in range(3)]
             elif result == 0.5:
                 res = self.tab_out[key][3:6]
-            #     self.list_for_a_lvert = list_in[3:6]
             elif 1 > result > 0.5:
-                res = [(self.lin_interpol(result, 0.5, 1, self.tab_out[key][3:6][i], self.tab_out[key][6:9][i])) for i in range(3)]
-            #     self.list_for_a_lvert = [(self.lin_interpol(result, 0.5, 1, list_in[3:6][i], list_in[6:9][i])) for i in range(3)]
+                res = [(self.lin_interpol(result, 0.5, 1, self.tab_out[key][3:6][i], self.tab_out[key][6:9][i])) for i
+                       in range(3)]
             elif result >= 1:
                 res = self.tab_out[key][6:9]
-                # self.list_for_a_lvert = list_in[6:9]
             self.tab_out1.update({key: res})
-
-
-
-
 
     def get_interpol_for_m(self, m) -> None:
         '''Интерполяция по m'''
@@ -156,17 +145,18 @@ class K_isp_contur:
         elif m == 2 or m == 4 or m == 2 or m == 6 or m == 8:
             list_out = self.tab_out1[m]
         elif m == 10:
-            list_out = [self.lin_interpol(m, min_m, max_m, self.tab_out1[min_m][i], self.tab_out1[max_m][i]) for i in range(3)]
+            list_out = [self.lin_interpol(m, min_m, max_m, self.tab_out1[min_m][i], self.tab_out1[max_m][i]) for i in
+                        range(3)]
         elif m == 12 and self.a1 / self.a2 != 0.5:
             list_out = self.tab_out1[m]
         elif m == 12 and self.a1 / self.a2 == 0.5:
             list_out = self.tab_out1['12*']
         elif m != 1 and m % 2 != 0 and m < 12:
-            list_out = [self.lin_interpol(m, min_m, max_m, self.tab_out1[min_m][i], self.tab_out1[max_m][i]) for i in range(3)]
+            list_out = [self.lin_interpol(m, min_m, max_m, self.tab_out1[min_m][i], self.tab_out1[max_m][i]) for i in
+                        range(3)]
         elif m > 12:
             list_out = self.tab_out1[12]
         self.interpol_dict_for_a_lvert(list_out, (self.a1 + self.a2) * 2 / m)
-
 
     def interpol_dict_for_a_lvert(self, list_in: list, a_middle):
         '''Интерполяция по a/lvert'''
@@ -182,15 +172,11 @@ class K_isp_contur:
             self.K_i = self.lin_interpol(a_middle, min_a_lvert, max_a_lvert, list_in[1], list_in[2])
         elif a_middle >= 2:
             self.K_i = list_in[2]
-        print(self.K_i)
 
 
 if __name__ == '__main__':
-        K_isp = K_isp_contur(250, 30, 2.5, 10, 8, 14)
-        K_isp.get_tabl()
-
-        for m in range(2, 13):
-            K_isp.get_interpol_for_m(m)
-
-
-
+    K_isp = K_isp_contur(250, 30, 2.5, 10, 8, 14)
+    K_isp.get_tabl()
+    for m in range(2, 13):
+        K_isp.get_interpol_for_m(m)
+        print(K_isp.K_i)

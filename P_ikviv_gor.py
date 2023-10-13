@@ -122,8 +122,4 @@ class get_P_gor:
 if __name__ == '__main__':
     P = get_P_gor(250, 30, 2.5, 0.8)
     for i in range(0, 210, 3):
-    #     i = i /10
-    #     print(i, P.min_max(i, [0.5, 1, 3, 10]))
-    # print(P.get_tab(8) * 30)
-    # print(P.get_tab(14) * 30)
         print(P.get_tab(i))

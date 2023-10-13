@@ -2,20 +2,20 @@ from P_ikviv_gor import get_P_gor
 from Сoefficient_isp import K_isp_contur, K_isp_ryad
 from math import pi, log
 
-
-
 class Book:
-    def __init__(self, p1, p2, h, l_vert, d_v, b, t, a1, a2, rast_vert, R_norm, m, tip_vert_zazem, tip_gor_zazem,
+    def __init__(self, p1, p2, h, l_vert, d_v, b, t, a1, a2, R_norm, m, tip_vert_zazem, tip_gor_zazem,
                  rasp_zazem):
         '''
-        m - число вертикальных заземлителей, шт. [2, 12];
         p1 - удельное сопротивление верхнего слоя грунта, Ом*м;
         p2 - удельное сопротивление нижнего слоя грунта, Ом*м;
         h - толщина(мощность) верхнего слоя грунта, м.;
         l_vert - длинна вертикального заземлителя, м.;
+        d_v - диаметр вертикального заземлителя, м.;
+        t - глубина укладки горизонтального заземлителя, м.;
         a1 - длинна горизонтального заземлителя, сторона 1, м.;
-        a2 - длинна горизонтального заземлителя, сторона 2, м.;;
-        a_middle - среднее расстояние между вертикальными заземлителями, м.;
+        a2 - длинна горизонтального заземлителя, сторона 2, м.;
+        R_norm - нормируемое сопротивление, Ом;
+        m - число вертикальных заземлителей, шт. [2, 12];
         '''
         self.p1 = p1
         self.p2 = p2
@@ -26,7 +26,6 @@ class Book:
         self.t = t
         self.a1 = a1
         self.a2 = a2
-        # self.rast_vert = rast_vert
         self.R_norm = R_norm
         self.m = m
         self.tip_vert_zazem = tip_vert_zazem
@@ -56,7 +55,6 @@ class Book:
         self.R_vert = round((self.P_ekviv / (2 * pi * self.l_vert ** 2)) * (self.l_vert * log(2 * self.l_vert / d_v) + (self.l_vert + self.t) * log((self.l_vert + self.t) / (self.l_vert + 2 * self.t)) + self.t * log(2 * self.t / (self.l_vert + 2 * self.t)) - 0.307 * self.l_vert), self.znak)
         self.g_vert = round(1 / self.R_vert, self.znak)
 
-
     def get_R_gor(self, a):
         '''В формуле 2.45а 2*r0*t а в примере r0*t'''
         d_g = self.get_ikviv_diametr(self.tip_vert_zazem,  self.b)
@@ -67,25 +65,21 @@ class Book:
         g_gor = round(1 /R_gor, 4)
         return P_gor, R_gor, g_gor
 
-
     def get_resist_for_contur(self):
         self.get_P_ekviv_vert()
         self.get_R_vert()
         R_gor1 = self.get_R_gor(self.a1)
         R_gor2 = self.get_R_gor(self.a2)
-
-        K = K_isp_contur(self.m, self.p1, self.p2, self.h, self.l_vert, self.a1, self.a2, 0.667)
+        K = K_isp_contur(self.p1, self.p2, self.h, self.l_vert, self.a1, self.a2)
         K.get_tabl()
+        K.get_interpol_for_m(self.m)
         K_isp_c = K.K_i
         R = 1 / (K_isp_c * (self.m * self.g_vert + 2 * R_gor1[2] + 2 * R_gor2[2]))
 
 
-
-
         print(self.P_ekviv, self.R_vert, self.g_vert, R_gor1, R_gor2, K_isp_c, R)
 if __name__ == '__main__':
-    B = Book(250, 30, 2.5, 10, 0.012, 0.040, 0.8, 8, 14, 6.77, 1, 6, 'круглый прокат', "полосовой прокат",
-             "по контуру")
+    B = Book(250, 30, 2.5, 10, 0.012, 0.040, 0.8, 8, 14, 1, 6, 'круглый прокат', "полосовой прокат","по контуру")
     B.get_resist_for_contur()
 
 

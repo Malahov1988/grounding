@@ -68,13 +68,13 @@ class Book:
     def get_resist_for_contur(self):
         self.get_P_ekviv_vert()
         self.get_R_vert()
-        R_gor1 = self.get_R_gor(self.a1)
-        R_gor2 = self.get_R_gor(self.a2)
+        P_gor1, R_gor1, g_gor1 = self.get_R_gor(self.a1)
+        P_gor2, R_gor2, g_gor2 = self.get_R_gor(self.a2)
         K = K_isp_contur(self.p1, self.p2, self.h, self.l_vert, self.a1, self.a2)
         K.get_tabl()
         K.get_interpol_for_m(self.m)
         K_isp_c = K.K_i
-        R = 1 / (K_isp_c * (self.m * self.g_vert + 2 * R_gor1[2] + 2 * R_gor2[2]))
+        R = 1 / (K_isp_c * (self.m * self.g_vert + 2 * g_gor1 + 2 * g_gor2))
 
 
         print(self.P_ekviv, self.R_vert, self.g_vert, R_gor1, R_gor2, K_isp_c, R)

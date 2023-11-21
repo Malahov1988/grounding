@@ -1,14 +1,45 @@
 class K_isp_ryad:
-    def __init__(self, m, p1, p2):
+    def __init__(self, p1, p2, m):
+        '''
+        p1 - удельное сопротивление верхнего слоя грунта, Ом*м;
+        p2 - удельное сопротивление нижнего слоя грунта, Ом*м;
+        m - число вертикальных заземлителей, шт. [2, 14];
+        h - толщина(мощность) верхнего слоя грунта, м.;
+        l_vert - длинна вертикального заземлителя, м.;
+        t - глубина укладки горизонтального заземлителя, м.;
+        a_middle - среднее расстояние между вертикальными заземлителями, м.;
+        '''
         self.m = m
         self.p1 = p1
         self.p2 = p2
         self.p = self.p1 / self.p2
+        # self.h = h
+        # self.l_vert = l_vert
+        # self.t = t
+        # self.a_middle = a / (m - 1)
 
-    def get_K_isp(self) -> float:
-        B_1 = 0.88 * self.p ** 0.0645
-        b_1 = 0.242 * self.p ** -0.083
-        return round(B_1 / (self.m ** b_1), 3)
+    # def conditions(self):
+    #     '''Проверка условий, см. стр. 238'''
+    #     if (2 <= self.m <= 14 and 0.5 <= self.a_middle / self.l_vert <= 2 and
+    #             0.05 <= self.t / self.l_vert <= 0.1 and 0.1 <= self.h / self.l_vert <= 1 and 0.5 <= self.p):
+    #         return True, 'True'
+    #     else:
+    #         return False, (f'''Условие 1: {2 <= self.m <= 14};\nУсловие 2: {0.5 <= self.a_middle / self.l_vert <= 2};\nУсловие 3: {0.05 <= self.t / self.l_vert <= 0.1};\nУсловие 4: {0.1 <= self.h / self.l_vert <= 1};\nУсловие 5: {0.5 <= self.p}''')
+
+    def get_K_isp(self) -> tuple:
+        '''См. стр. 238.'''
+        # conditions, text_error = self.conditions()
+        # if conditions:
+        if self.p > 10:
+            B_1 = 0.88 * 10 ** 0.0645
+            b_1 = 0.242 * 10 ** -0.083
+            return round(B_1 / (self.m ** b_1), 3)
+        else:
+            B_1 = 0.88 * self.p ** 0.0645
+            b_1 = 0.242 * self.p ** -0.083
+            return round(B_1 / (self.m ** b_1), 3)
+    # else:
+    #     return text_error, False
 
 
 class K_isp_contur:
@@ -78,17 +109,16 @@ class K_isp_contur:
         for i in range(len(list_in)):
             if value in list_in:
                 min_v = max_v = value
-                break
+                return min_v, max_v
             elif value <= list_in[0]:
                 min_v, max_v = list_in[0], list_in[0]
-                break
+                return min_v, max_v
             elif value < list_in[i] and list_in[-1] > value > list_in[0]:
                 min_v, max_v = list_in[i - 1], list_in[i]
-                break
+                return min_v, max_v
             elif value >= list_in[-1]:
                 min_v, max_v = list_in[-1], list_in[-1]
-                break
-        return min_v, max_v
+                return min_v, max_v
 
     def get_tabl(self) -> None:
         '''Получаем таблицы для соответствующего p1/p2'''
@@ -137,7 +167,7 @@ class K_isp_contur:
                 res = self.tab_out[key][6:9]
             self.tab_out1.update({key: res})
 
-    def get_interpol_for_m(self, m) -> None:
+    def get_interpol_for_m(self, m):
         '''Интерполяция по m'''
         min_m, max_m = self.min_max(m, [2, 4, 6, 8, 12])
         if m == 1:
@@ -156,27 +186,24 @@ class K_isp_contur:
                         range(3)]
         elif m > 12:
             list_out = self.tab_out1[12]
-        self.interpol_dict_for_a_lvert(list_out, (self.a1 + self.a2) * 2 / m)
+        return self.interpol_dict_for_a_lvert(list_out, (self.a1 + self.a2) * 2 / m)
 
     def interpol_dict_for_a_lvert(self, list_in: list, a_middle):
         '''Интерполяция по a/lvert'''
         a_middle = a_middle / self.l_vert
         min_a_lvert, max_a_lvert = self.min_max(a_middle, [0.5, 1, 2])
         if a_middle <= 0.5:
-            self.K_i = list_in[0]
+            return list_in[0]
         elif 1 > a_middle > 0.5:
-            self.K_i = self.lin_interpol(a_middle, min_a_lvert, max_a_lvert, list_in[0], list_in[1])
+            return self.lin_interpol(a_middle, min_a_lvert, max_a_lvert, list_in[0], list_in[1])
         elif a_middle == 1:
-            self.K_i = list_in[1]
+            return list_in[1]
         elif 2 > a_middle > 1:
-            self.K_i = self.lin_interpol(a_middle, min_a_lvert, max_a_lvert, list_in[1], list_in[2])
+            return self.lin_interpol(a_middle, min_a_lvert, max_a_lvert, list_in[1], list_in[2])
         elif a_middle >= 2:
-            self.K_i = list_in[2]
+            return list_in[2]
 
 
 if __name__ == '__main__':
-    K_isp = K_isp_contur(250, 30, 2.5, 10, 8, 14)
-    K_isp.get_tabl()
-    for m in range(2, 13):
-        K_isp.get_interpol_for_m(m)
-        print(K_isp.K_i)
+    K_isp = K_isp_ryad(250, 30, 5)
+    print(K_isp.get_K_isp())

@@ -16,8 +16,8 @@ class get_P_gor:
               3: [9.45, 8.51, 7.66, 7.33, 7.10, 6.94, 6.65, 6.57, 6.46, 6.38, 3.34, 6.11, 6.04, 5.85],
               5: [9.66, 9.26, 8.42, 8.14, 7.73, 7.56, 7.43, 7.32, 7.21, 7.10, 6.91, 6.80, 6.69, 6.50]}
     tab_20 = {1: [11.40, 10.10, 8.85, 8.26, 7.90, 7.62, 7.45, 7.23, 7.13, 7.04, 6.99, 6.79, 6.55, 6.42],
-              3: [18.10, 16.80, 15.10, 14.30, 13.60, 13.00, 12.70, 12.50, 12.30, 12.10, 11.90, 11.40, 11.10],
-              5: [19.8, 18.1, 16.8, 16.0, 15.4, 14.7, 14.6, 14.3, 13.9, 13.7, 13.4, 13.4, 12.9, 12.4]}
+              3: [18.10, 16.80, 15.10, 14.30, 13.60, 13.00, 13.00, 12.70, 12.50, 12.30, 12.10, 11.90, 11.40, 11.10],
+              5: [19.80, 18.10, 16.80, 16.00, 15.40, 14.70, 14.60, 14.30, 13.90, 13.70, 13.40, 13.40, 12.90, 12.40]}
 
     def __init__(self, p1, p2, h, t):
         self.tabl = {}
@@ -31,17 +31,17 @@ class get_P_gor:
         for i in range(len(list_in)):
             if value in list_in:
                 min_v = max_v = value
-                break
+                return min_v, max_v
             elif value <= list_in[0]:
                 min_v, max_v = list_in[0], list_in[0]
-                break
+                return min_v, max_v
             elif value < list_in[i] and list_in[-1] > value > list_in[0]:
                 min_v, max_v = list_in[i - 1], list_in[i]
-                break
+                return min_v, max_v
             elif value >= list_in[-1]:
                 min_v, max_v = list_in[-1], list_in[-1]
-                break
-        return min_v, max_v
+                return min_v, max_v
+
 
     @staticmethod
     def lin_interpol(x, x1, x2, f_x1, f_x2):
@@ -80,8 +80,7 @@ class get_P_gor:
         dict_out = {}
         min_p, max_p = self.min_max(self.p, [0.5, 1, 2, 5, 10, 20])
         for k, v in dict_in_1.items():
-            list_val_aftet_interp = [self.lin_interpol(self.p, min_p, max_p, dict_in_1[k][i], dict_in_2[k][i]) for i in
-                                     range(14)]
+            list_val_aftet_interp = [self.lin_interpol(self.p, min_p, max_p, dict_in_1[k][i], dict_in_2[k][i]) for i in range(14)]
             dict_out.update({k: list_val_aftet_interp})
         return dict_out
 
@@ -90,14 +89,12 @@ class get_P_gor:
         if self.h <= 1:
             self.list_out = self.tabl[1]
         elif 3 > self.h > 1:
-            self.list_out = [self.lin_interpol(self.h, min_h, max_h, self.tabl[1][i], self.tabl[3][i]) for i in
-                             range(14)]
+            self.list_out = [self.lin_interpol(self.h, min_h, max_h, self.tabl[1][i], self.tabl[3][i]) for i in range(14)]
         elif self.h <= 3:
             self.list_out = self.tabl[3]
-        elif 5 > self.h > 5:
-            self.list_out = [self.lin_interpol(self.h, min_h, max_h, self.tabl[3][i], self.tabl[5][i]) for i in
-                             range(14)]
-        elif self.h <= 5:
+        elif 5 > self.h > 3:
+            self.list_out = [self.lin_interpol(self.h, min_h, max_h, self.tabl[3][i], self.tabl[5][i]) for i in range(14)]
+        elif self.h >= 5:
             self.list_out = self.tabl[5]
 
     def interpol_for_l(self, l_gor):

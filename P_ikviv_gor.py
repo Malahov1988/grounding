@@ -118,5 +118,5 @@ class get_P_gor:
 
 if __name__ == '__main__':
     P = get_P_gor(250, 30, 2.5, 0.8)
-    for i in range(0, 210, 3):
-        print(P.get_tab(i))
+
+    print(P.get_tab(40))

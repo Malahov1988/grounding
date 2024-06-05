@@ -3,9 +3,9 @@ import os
 import sys
 from calc_book import Book
 
-from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtWidgets import QWidget, QApplication, QGroupBox, QVBoxLayout, QLabel, QGridLayout, QLineEdit, QHBoxLayout, \
-    QFormLayout, QComboBox, QRadioButton, QPushButton, QFileDialog, QMessageBox
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QWidget, QApplication, QGroupBox, QVBoxLayout, QLabel, QGridLayout, QLineEdit, \
+    QFormLayout, QComboBox, QPushButton, QFileDialog, QMessageBox
 
 
 class MainWidget(QWidget):
@@ -264,12 +264,12 @@ class Widget_in(QGroupBox):
 
     def action_QB_climat(self, l_vert, l_gor):
         ration_vetr_clam, ration_gor_clam = 1, 1
-        dict_l_vert_climat_wet = {3: ['1.9', '1.7', '1.5', '1.3'], 5: ['1.5', '1.4', '1.3', '1.2']}
-        dict_l_gor_climat_wet = {10: ['9.3', '5.9', '4.2', '2.5'], 50: ['7.2', '4.8', '3.2', '2.2']}
+        # dict_l_vert_climat_wet = {3: ['1.9', '1.7', '1.5', '1.3'], 5: ['1.5', '1.4', '1.3', '1.2']}
+        # dict_l_gor_climat_wet = {10: ['9.3', '5.9', '4.2', '2.5'], 50: ['7.2', '4.8', '3.2', '2.2']}
         dict_l_vert_climat_normal = {3: ['1.7', '1.5', '1.3', '1.1'], 5: ['1.4', '1.3', '1.2', '1.1']}
         dict_l_gor_climat_normal = {10: ['5.5', '3.5', '2.5', '1.5'], 50: ['4.5', '3.0', '2.0', '1.4']}
-        dict_l_vert_climat_dry = {3: ['1.5', '1.3', '1.2', '1.0'], 5: ['1.3', '1.2', '1.1', '1.0']}
-        dict_l_gor_climat_dry = {10: ['4.1', '2.6', '2.0', '1.1'], 50: ['3.6', '2.4', '1.6', '1.12']}
+        # dict_l_vert_climat_dry = {3: ['1.5', '1.3', '1.2', '1.0'], 5: ['1.3', '1.2', '1.1', '1.0']}
+        # dict_l_gor_climat_dry = {10: ['4.1', '2.6', '2.0', '1.1'], 50: ['3.6', '2.4', '1.6', '1.12']}
         cc = {'Зона 1': 0, 'Зона 2': 1, 'Зона 3': 2, 'Зона 4': 3}
         zona = self.dict_CB['Климатическая зона'].currentText()
         for i in dict_l_vert_climat_normal.keys():

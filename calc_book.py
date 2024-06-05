@@ -101,20 +101,7 @@ class Book:
                           round(l_total / self.m, 2), l_total]
         else:
             return False, error
-        # elif self.calc == True:
-        #     for m in range(2, 13):
-        #         K_isp_c = K.get_interpol_for_m(m)
-        #         R = round(1 / (K_isp_c * (m * self.g_vert + 2 * g_gor1 + 2 * g_gor2)), self.znak)
-        #
-        #         # conditions, error = self.conditions_for_contur(m)
-        #         if R * self.zapas < self.R_norm:
-        #         # if R * self.zapas < self.R_norm and conditions:
-        #             return True, [self.P_ekviv, self.R_vert, self.g_gor, K_isp_c, P_gor1, R_gor1, g_gor1, P_gor2, R_gor2, g_gor1, m, R,
-        #                           round(l_total / m, 2), l_total]
-        #         # # elif m > 12 and not conditions:
-        #         #     return False, error
-        #         # else:
-        #         #     return False, 'error'
+
 
     def get_resist_for_rayd(self):
         self.get_P_ekviv_vert()
@@ -128,19 +115,7 @@ class Book:
                           round(self.a1 / (self.m - 1), 2), self.a1]
         else:
             return False, error
-        # elif self.calc == True:
-        #     for m in range(2, 15):
-        #         conditions, error = self.conditions_for_rayd(m)
-        #         K_isp = K_isp_ryad(self.p1, self.p2, m).get_K_isp()
-        #         R = round(1 / (K_isp * (m * self.g_vert + g_gor1)), self.znak)
-        #         if R * self.zapas < self.R_norm and conditions:
-        #             return True, [self.P_ekviv, self.R_vert, self.g_gor, K_isp, P_gor1, R_gor1, '*', '*', m, R,
-        #                           round(self.a1 / (m - 1), 2), self.a1]
-        #         elif m > 14 and not conditions:
-        #             return False, error
-        #         else:
-        #             print(error, m, not conditions)
-        #             # return False, error
+
 
     def conditions_for_rayd(self, m):
         '''Проверка условий, см. стр. 238'''
@@ -154,7 +129,6 @@ class Book:
         '''Проверка условий, см. стр. 238'''
         a_middle = (self.a1 + self.a2) * 2 / m
         error = f'''Условие, 2 <= m ({int(m)})\t\t\t{2 <= m}\nУсловие, 0.2 <= h / l_в <= 1 ({round(self.h / self.l_vert, 2)})\t\t{0.2 <= self.h / self.l_vert <= 1}\nУсловие, 0.5 <= a_ср / l_в ({round(a_middle / self.l_vert, 2)}) \t\t{0.5 <= a_middle / self.l_vert}'''
-
         if 2 <= m and 0.2 <= self.h / self.l_vert <= 1 and 0.5 <= a_middle / self.l_vert:
             return True, ''
         else:
@@ -165,10 +139,3 @@ class Book:
             return self.get_resist_for_contur()
         else:
             return self.get_resist_for_rayd()
-
-
-
-if __name__ == '__main__':
-    res = Book(250, 30, 2.5, 10, 0.012, 8, 14, 0.040, 0.8, 2, 6, 'круглый прокат', "полосовой прокат", "по контуру",
-               False)
-    print(res.calc_zazem())

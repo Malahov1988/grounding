@@ -115,8 +115,3 @@ class get_P_gor:
             p_ikviv = self.lin_interpol(l_gor, min_l, max_l, value_min_l, value_max_l)
         return p_ikviv
 
-
-if __name__ == '__main__':
-    P = get_P_gor(250, 30, 2.5, 0.8)
-
-    print(P.get_tab(40))

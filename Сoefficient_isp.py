@@ -13,23 +13,9 @@ class K_isp_ryad:
         self.p1 = p1
         self.p2 = p2
         self.p = self.p1 / self.p2
-        # self.h = h
-        # self.l_vert = l_vert
-        # self.t = t
-        # self.a_middle = a / (m - 1)
-
-    # def conditions(self):
-    #     '''Проверка условий, см. стр. 238'''
-    #     if (2 <= self.m <= 14 and 0.5 <= self.a_middle / self.l_vert <= 2 and
-    #             0.05 <= self.t / self.l_vert <= 0.1 and 0.1 <= self.h / self.l_vert <= 1 and 0.5 <= self.p):
-    #         return True, 'True'
-    #     else:
-    #         return False, (f'''Условие 1: {2 <= self.m <= 14};\nУсловие 2: {0.5 <= self.a_middle / self.l_vert <= 2};\nУсловие 3: {0.05 <= self.t / self.l_vert <= 0.1};\nУсловие 4: {0.1 <= self.h / self.l_vert <= 1};\nУсловие 5: {0.5 <= self.p}''')
 
     def get_K_isp(self) -> tuple:
         '''См. стр. 238.'''
-        # conditions, text_error = self.conditions()
-        # if conditions:
         if self.p > 10:
             B_1 = 0.88 * 10 ** 0.0645
             b_1 = 0.242 * 10 ** -0.083
@@ -38,8 +24,7 @@ class K_isp_ryad:
             B_1 = 0.88 * self.p ** 0.0645
             b_1 = 0.242 * self.p ** -0.083
             return round(B_1 / (self.m ** b_1), 3)
-    # else:
-    #     return text_error, False
+
 
 
 class K_isp_contur:
@@ -202,8 +187,3 @@ class K_isp_contur:
             return self.lin_interpol(a_middle, min_a_lvert, max_a_lvert, list_in[1], list_in[2])
         elif a_middle >= 2:
             return list_in[2]
-
-
-if __name__ == '__main__':
-    K_isp = K_isp_ryad(250, 30, 5)
-    print(K_isp.get_K_isp())
